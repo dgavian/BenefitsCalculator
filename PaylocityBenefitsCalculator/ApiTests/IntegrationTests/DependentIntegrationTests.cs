@@ -74,7 +74,7 @@ public class DependentIntegrationTests : IntegrationTest
     public async Task WhenAskedForANonexistentDependent_ShouldReturn404()
     {
         var response = await HttpClient.GetAsync($"/api/v1/dependents/{int.MinValue}");
-        await response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound);
     }
 }
 

@@ -104,7 +104,7 @@ public class EmployeeIntegrationTests : IntegrationTest
     public async Task WhenAskedForANonexistentEmployee_ShouldReturn404()
     {
         var response = await HttpClient.GetAsync($"/api/v1/employees/{int.MinValue}");
-        await response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound);
     }
 }
 

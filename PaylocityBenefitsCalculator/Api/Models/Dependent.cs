@@ -1,5 +1,7 @@
 ﻿namespace Api.Models;
 
+
+// TODO: Derive a spouse, domestic partner, and child class from this and enforce the constraints based on the type.
 public class Dependent
 {
     public int Id { get; set; }
