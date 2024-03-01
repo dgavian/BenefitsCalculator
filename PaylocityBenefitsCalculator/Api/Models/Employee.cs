@@ -7,5 +7,6 @@ public class Employee
     public string? LastName { get; set; }
     public decimal Salary { get; set; }
     public DateTime DateOfBirth { get; set; }
-    public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
+    public Partner? Partner { get; set; }
+    public ICollection<Child> Children { get; set; } = new List<Child>();
 }
