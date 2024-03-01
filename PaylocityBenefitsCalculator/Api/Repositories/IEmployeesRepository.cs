@@ -1,5 +1,4 @@
-﻿using Api.Dtos.Employee;
-using Api.Models;
+﻿using Api.Models;
 
 namespace Api.Repositories
 {
@@ -7,5 +6,7 @@ namespace Api.Repositories
     {
         Task<List<Employee>> GetAllEmployeesAsync();
         Task<Employee?> GetEmployeeAsync(int id);
+        Task<List<Dependent>> GetAllDependentsAsync();
+        Task<Dependent?> GetDependentAsync(int id);
     }
 }

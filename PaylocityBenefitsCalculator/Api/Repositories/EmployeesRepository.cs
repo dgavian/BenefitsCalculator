@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace Api.Repositories
@@ -24,6 +25,28 @@ namespace Api.Repositories
             var employees = await GetAllEmployeesAsync();
             var employee = employees.FirstOrDefault(e => e.Id == id);
             return employee;
+        }
+
+        public async Task<List<Dependent>> GetAllDependentsAsync()
+        {
+            var result = new List<Dependent>();
+            var employees = await GetAllEmployeesAsync();
+            employees.ForEach(e =>
+            {
+                if (e.Partner != null)
+                {
+                    result.Add(e.Partner);
+                }
+                result.AddRange(e.Children);
+            });
+            return result;
+        }
+
+        public async Task<Dependent?> GetDependentAsync(int id)
+        {
+            var dependents = await GetAllDependentsAsync();
+            var dependent = dependents.FirstOrDefault(d => d.Id == id);
+            return dependent;
         }
     }
 }

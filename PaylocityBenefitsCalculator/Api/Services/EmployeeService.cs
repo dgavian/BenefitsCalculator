@@ -27,6 +27,19 @@ namespace Api.Services
             return result;
         }
 
+        public async Task<List<GetDependentDto>> GetAllDependentsAsync()
+        {
+            var dependents = await _employeesRepo.GetAllDependentsAsync();
+            return MapDependents(dependents);
+        }
+
+        public async Task<GetDependentDto?> GetDependentAsync(int dependentId)
+        {
+            var dependent = await _employeesRepo.GetDependentAsync(dependentId);
+            var result = dependent != null ? MapDependent(dependent) : null;
+            return result;
+        }
+
         private static List<GetEmployeeDto> MapEmployees(List<Employee> employees)
         {
             var result = new List<GetEmployeeDto>();
@@ -71,6 +84,16 @@ namespace Api.Services
                 result.Add(mappedChild);
             }
 
+            return result;
+        }
+
+        private static List<GetDependentDto> MapDependents(List<Dependent> dependents)
+        {
+            var result = new List<GetDependentDto>();
+            dependents.ForEach(dependent =>
+            {
+                result.Add(MapDependent(dependent));
+            });
             return result;
         }
 
