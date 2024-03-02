@@ -1,18 +1,20 @@
 ﻿using Api.Models;
 using System;
 using Xunit;
+using Moq;
+using Api.Utilities;
 
 namespace ApiTests.UnitTests.Models
 {
-    public class PaycheckTests
+    public class PaycheckTests : IDisposable
     {
         private const int DefaultEmployeeId = 42;
         private const int RootDependentId = 3;
 
         private const decimal DefaultSalary = 78000m;
 
-        private static readonly DateTime _defaultEmployeeBirthday = new DateTime(1989, 2, 16);
-        private static readonly DateTime _defaultPartnerBirthday = new DateTime(1991, 7, 10);
+        private static readonly DateTime _defaultEmployeeBirthday = new DateTime(1980, 2, 16);
+        private static readonly DateTime _defaultPartnerBirthday = new DateTime(1974, 3, 3);
         private static readonly DateTime _rootChildBirthday = new DateTime(2019, 11, 2);
 
         [Fact]
@@ -25,6 +27,7 @@ namespace ApiTests.UnitTests.Models
             var expectedDeductions = 461.54m;
             var expectedNetPay = 2538.46m;
             var expectedEmployeeName = "Test Employee";
+            SetUpTimeProvider();
             var paycheck = MakeSut();
 
             paycheck.Calculate(employee);
@@ -51,6 +54,7 @@ namespace ApiTests.UnitTests.Models
             // Total expected deductions = 2400 (461.5384615384615 base employee cost + 1938.461538461538 total dependents cost)
             var expectedDeductions = 2400m;
             var expectedNetPay = 600m;
+            SetUpTimeProvider();
             var paycheck = MakeSut();
 
             paycheck.Calculate(employee);
@@ -65,7 +69,7 @@ namespace ApiTests.UnitTests.Models
         {
             var numChildren = 2;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
-            var partnerBirthday = new DateTime(1969, 4, 11);
+            var partnerBirthday = new DateTime(1974, 3, 2);
             MakePartner(employee, Relationship.Spouse, partnerBirthday);
             MakeChildren(numChildren, employee);
             var expectedGrossPay = 3000m;
@@ -77,6 +81,7 @@ namespace ApiTests.UnitTests.Models
             // (461.5384615384615 base employee cost + 830.7692307692307 base dependents cost + 92.30769230769231 additional dependent deduction for partner over 50)
             var expectedDeductions = 1384.62m;
             var expectedNetPay = 1615.38m;
+            SetUpTimeProvider();
             var paycheck = MakeSut();
 
             paycheck.Calculate(employee);
@@ -99,6 +104,7 @@ namespace ApiTests.UnitTests.Models
             // 523.0769307692307 (461.5384615384615 base employee cost + 61.53846923076923)
             var expectedDeductions = 523.08m;
             var expectedNetPay = 2553.84m;
+            SetUpTimeProvider();
             var paycheck = MakeSut();
 
             paycheck.Calculate(employee);
@@ -111,21 +117,17 @@ namespace ApiTests.UnitTests.Models
         [Fact]
         public void Calculate_AllEdgeCasesCombined_PopulatesExpectedData()
         {
-            // TODO: Update to include salary over 80000.
+            var salary = 80000.01m;
             var numChildren = 2;
-            var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
-            var partnerBirthday = new DateTime(1969, 4, 11);
+            var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, salary);
+            var partnerBirthday = new DateTime(1974, 3, 1);
             MakePartner(employee, Relationship.Spouse, partnerBirthday);
             MakeChildren(numChildren, employee);
-            var expectedGrossPay = 3000m;
-            // Total base dependent deductions per paycheck = 830.7692307692307
-            // (276.9230769230769 * 3 = 830.7692307692307 (1 partner + 2 children))
-            // Additional dependent deduction for partner over 50 = 92.30769230769231
-            // (200 per month = 2400 per year; 2400 / 26 = 92.30769230769231)
-            // Total expected deductions = 1384.615384615385
-            // (461.5384615384615 base employee cost + 830.7692307692307 base dependents cost + 92.30769230769231 additional dependent deduction for partner over 50)
-            var expectedDeductions = 1384.62m;
-            var expectedNetPay = 1615.38m;
+            var expectedGrossPay = 3076.92m;
+            // Total expected deductions = 1446.153853846154 (1384.615384615385 + 61.53846923076923; see previous 2 tests)
+            var expectedDeductions = 1446.15m;
+            var expectedNetPay = 1630.77m;
+            SetUpTimeProvider();
             var paycheck = MakeSut();
 
             paycheck.Calculate(employee);
@@ -133,6 +135,16 @@ namespace ApiTests.UnitTests.Models
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
             Assert.Equal(expectedNetPay, paycheck.NetPay);
+        }
+
+        public void Dispose() => TimeProvider.ResetToDefault();
+
+        private static void SetUpTimeProvider()
+        {
+            var fakeTimeProvider = new Mock<TimeProvider>();
+            var today = new DateTime(2024, 3, 2);
+            fakeTimeProvider.Setup(t => t.Today).Returns(today);
+            TimeProvider.Current = fakeTimeProvider.Object;
         }
 
         private static Paycheck MakeSut()
