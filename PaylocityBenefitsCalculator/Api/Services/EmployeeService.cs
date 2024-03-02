@@ -1,6 +1,5 @@
 ﻿using Api.Dtos.Dependent;
 using Api.Dtos.Employee;
-using Api.Models;
 using Api.Repositories;
 
 namespace Api.Services
@@ -17,97 +16,26 @@ namespace Api.Services
         public async Task<List<GetEmployeeDto>> GetAllEmployeesAsync()
         {
             var employees = await _employeesRepo.GetAllEmployeesAsync();
-            return MapEmployees(employees);
+            return ModelToDtoMapper.MapEmployees(employees);
         }
 
         public async Task<GetEmployeeDto?> GetEmployeeAsync(int employeeId)
         {
             var employee = await _employeesRepo.GetEmployeeAsync(employeeId);
-            var result = employee != null ? MapEmployee(employee) : null;
+            var result = employee != null ? ModelToDtoMapper.MapEmployee(employee) : null;
             return result;
         }
 
         public async Task<List<GetDependentDto>> GetAllDependentsAsync()
         {
             var dependents = await _employeesRepo.GetAllDependentsAsync();
-            return MapDependents(dependents);
+            return ModelToDtoMapper.MapDependents(dependents);
         }
 
         public async Task<GetDependentDto?> GetDependentAsync(int dependentId)
         {
             var dependent = await _employeesRepo.GetDependentAsync(dependentId);
-            var result = dependent != null ? MapDependent(dependent) : null;
-            return result;
-        }
-
-        private static List<GetEmployeeDto> MapEmployees(List<Employee> employees)
-        {
-            var result = new List<GetEmployeeDto>();
-
-            employees.ForEach(e =>
-            {
-                var mappedEmployee = MapEmployee(e);
-                result.Add(mappedEmployee);
-            });
-
-            return result;
-        }
-
-        private static GetEmployeeDto MapEmployee(Employee employee)
-        {
-            var result = new GetEmployeeDto
-            {
-                DateOfBirth = employee.DateOfBirth,
-                FirstName = employee.FirstName,
-                LastName = employee.LastName,
-                Id = employee.Id,
-                Salary = employee.Salary,
-                Dependents = MapDependents(employee)
-            };
-
-            return result;
-        }
-
-        private static List<GetDependentDto> MapDependents(Employee employee)
-        {
-            var result = new List<GetDependentDto>();
-
-            if (employee.Partner != null)
-            {
-                var mappedPartner = MapDependent(employee.Partner);
-                result.Add(mappedPartner);
-            }
-
-            foreach (var child in employee.Children)
-            {
-                var mappedChild = MapDependent(child);
-                result.Add(mappedChild);
-            }
-
-            return result;
-        }
-
-        private static List<GetDependentDto> MapDependents(List<Dependent> dependents)
-        {
-            var result = new List<GetDependentDto>();
-            dependents.ForEach(dependent =>
-            {
-                result.Add(MapDependent(dependent));
-            });
-            return result;
-        }
-
-        private static GetDependentDto MapDependent(Dependent dependent)
-        {
-            var result = new GetDependentDto
-            {
-                Id = dependent.Id,
-                DateOfBirth = dependent.DateOfBirth,
-                FirstName = dependent.FirstName,
-                LastName = dependent.LastName,
-                Relationship = dependent.Relationship
-            };
-
+            var result = dependent != null ? ModelToDtoMapper.MapDependent(dependent) : null;
             return result;
         }
     }
