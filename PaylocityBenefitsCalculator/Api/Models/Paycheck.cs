@@ -90,6 +90,8 @@ namespace Api.Models
 
             static decimal CalculateAdditionalDependentDeductions(DateTime dependentBirthday)
             {
+                // This check might only make sense for partners and not children;
+                // would want to verify with product.
                 var dependentAge = Helpers.GetAge(dependentBirthday);
                 if (dependentAge < AgeThreshold)
                 {

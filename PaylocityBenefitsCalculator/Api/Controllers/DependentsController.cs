@@ -19,13 +19,10 @@ public class DependentsController : BaseController
 
     [SwaggerOperation(Summary = "Get dependent by id")]
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<GetDependentDto>>> Get(int id)
+    public async Task<ActionResult<ApiResponse<GetDependentDto?>>> Get(int id)
     {
         var dependent = await _employeeService.GetDependentAsync(id);
-        var isFound = dependent != null;
-        var func = GetObjectResultFunc(isFound);
-        var response = MakeResponse(dependent, isFound);
-        return func(response);
+        return GetActionResultForNullableItem(dependent);
     }
 
     [SwaggerOperation(Summary = "Get all dependents")]

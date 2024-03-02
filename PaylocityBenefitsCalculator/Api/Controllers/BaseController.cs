@@ -15,9 +15,12 @@ namespace Api.Controllers
             };
         }
 
-        protected Func<object?, ActionResult> GetObjectResultFunc(bool isFound)
+        protected ActionResult<ApiResponse<T>> GetActionResultForNullableItem<T>(T item) where T : class?
         {
-            return isFound ? Ok : NotFound;
+            var isFound = item != null;
+            Func<object?, ActionResult> func = isFound ? Ok : NotFound;
+            var response = MakeResponse(item, isFound);
+            return func(response);
         }
     }
 }

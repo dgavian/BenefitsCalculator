@@ -19,13 +19,10 @@ public class EmployeesController : BaseController
 
     [SwaggerOperation(Summary = "Get employee by id")]
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<GetEmployeeDto>>> Get(int id)
+    public async Task<ActionResult<ApiResponse<GetEmployeeDto?>>> Get(int id)
     {
         var employee = await _employeeService.GetEmployeeAsync(id);
-        var isFound = employee != null;
-        var func = GetObjectResultFunc(isFound);
-        var response = MakeResponse(employee, isFound);
-        return func(response);
+        return GetActionResultForNullableItem(employee);
     }
 
     [SwaggerOperation(Summary = "Get all employees")]
