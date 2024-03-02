@@ -18,7 +18,7 @@ namespace ApiTests.UnitTests.Models
         private static readonly DateTime _rootChildBirthday = new DateTime(2019, 11, 2);
 
         [Fact]
-        public void Calculate_NoDependents_PopulatesExpectedData()
+        public void CalculateAndFill_NoDependents_PopulatesExpectedData()
         {
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
             // 78000 salary / 26 paychecks per year = 3000
@@ -30,7 +30,7 @@ namespace ApiTests.UnitTests.Models
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.Calculate(employee);
+            paycheck.CalculateAndFill(employee);
 
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
@@ -40,7 +40,7 @@ namespace ApiTests.UnitTests.Models
         }
 
         [Fact]
-        public void Calculate_MultipleDependents_PopulatesExpectedData()
+        public void CalculateAndFill_MultipleDependents_PopulatesExpectedData()
         {
             var numChildren = 6;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
@@ -57,7 +57,7 @@ namespace ApiTests.UnitTests.Models
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.Calculate(employee);
+            paycheck.CalculateAndFill(employee);
 
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
@@ -65,7 +65,7 @@ namespace ApiTests.UnitTests.Models
         }
 
         [Fact]
-        public void Calculate_OneDependentOverFifty_PopulatesExpectedData()
+        public void CalculateAndFill_OneDependentOverFifty_PopulatesExpectedData()
         {
             var numChildren = 2;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
@@ -84,7 +84,7 @@ namespace ApiTests.UnitTests.Models
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.Calculate(employee);
+            paycheck.CalculateAndFill(employee);
 
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
@@ -92,7 +92,7 @@ namespace ApiTests.UnitTests.Models
         }
 
         [Fact]
-        public void Calculate_NoDependentsSalaryAboveThreshold_PopulatesExpectedData()
+        public void CalculateAndFill_NoDependentsSalaryAboveThreshold_PopulatesExpectedData()
         {
             var salary = 80000.01m;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, salary);
@@ -107,7 +107,7 @@ namespace ApiTests.UnitTests.Models
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.Calculate(employee);
+            paycheck.CalculateAndFill(employee);
 
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
@@ -115,7 +115,7 @@ namespace ApiTests.UnitTests.Models
         }
 
         [Fact]
-        public void Calculate_AllEdgeCasesCombined_PopulatesExpectedData()
+        public void CalculateAndFill_AllEdgeCasesCombined_PopulatesExpectedData()
         {
             var salary = 80000.01m;
             var numChildren = 2;
@@ -130,7 +130,7 @@ namespace ApiTests.UnitTests.Models
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.Calculate(employee);
+            paycheck.CalculateAndFill(employee);
 
             Assert.Equal(expectedGrossPay, paycheck.GrossPay);
             Assert.Equal(expectedDeductions, paycheck.Deductions);
@@ -176,7 +176,8 @@ namespace ApiTests.UnitTests.Models
         {
             for (int i = 0; i < numChildren; i++)
             {
-                var birthday = _rootChildBirthday.AddYears(i);
+                var yearDecrement = i * -1;
+                var birthday = _rootChildBirthday.AddYears(yearDecrement);
                 var child = MakeDependent(i + RootDependentId, Relationship.Child, birthday);
                 child.Employee = employee;
                 child.EmployeeId = employee.Id;
