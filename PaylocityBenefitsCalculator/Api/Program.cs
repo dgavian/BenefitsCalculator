@@ -1,3 +1,4 @@
+using Api.Models;
 using Api.Repositories;
 using Api.Services;
 using Microsoft.OpenApi.Models;
@@ -28,7 +29,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+builder.Services.AddScoped<IDependentService, DependentService>();
+builder.Services.AddScoped<Repository<Employee>, EmployeesRepository>();
+builder.Services.AddScoped<Repository<Dependent>, DependentsRepository>();
 
 var app = builder.Build();
 

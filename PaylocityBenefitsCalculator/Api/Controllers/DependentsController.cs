@@ -10,18 +10,18 @@ namespace Api.Controllers;
 [Route("api/v1/[controller]")]
 public class DependentsController : BaseController
 {
-    private readonly IEmployeeService _employeeService;
+    private readonly IDependentService _dependentService;
 
-    public DependentsController(IEmployeeService employeeService)
+    public DependentsController(IDependentService dependentService)
     {
-        _employeeService = employeeService;
+        _dependentService = dependentService;
     }
 
     [SwaggerOperation(Summary = "Get dependent by id")]
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<GetDependentDto?>>> Get(int id)
     {
-        var dependent = await _employeeService.GetDependentAsync(id);
+        var dependent = await _dependentService.GetDependentAsync(id);
         return GetActionResultForNullableItem(dependent);
     }
 
@@ -29,7 +29,7 @@ public class DependentsController : BaseController
     [HttpGet("")]
     public async Task<ActionResult<ApiResponse<List<GetDependentDto>>>> GetAll()
     {
-        var dependents = await _employeeService.GetAllDependentsAsync();
+        var dependents = await _dependentService.GetAllDependentsAsync();
         var sucess = true;
         var response = MakeResponse(dependents, sucess);
         return Ok(response);
