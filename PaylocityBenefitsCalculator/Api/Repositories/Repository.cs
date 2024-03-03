@@ -18,7 +18,6 @@ namespace Api.Repositories
             return employees ?? new List<Employee>();
         }
 
-        // This approach won't work well if anything beyond basic CRUD operations are required.
         public abstract Task<List<T>> GetAllAsync();
 
         public abstract Task<T?> GetAsync(int id);

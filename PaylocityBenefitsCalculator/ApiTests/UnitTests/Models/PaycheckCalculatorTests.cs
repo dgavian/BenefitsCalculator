@@ -3,10 +3,11 @@ using System;
 using Xunit;
 using Moq;
 using Api.Utilities;
+using Api.Services;
 
 namespace ApiTests.UnitTests.Models
 {
-    public class PaycheckTests : IDisposable
+    public class PaycheckCalculatorTests : IDisposable
     {
         private const int DefaultEmployeeId = 42;
         private const int RootDependentId = 3;
@@ -18,7 +19,7 @@ namespace ApiTests.UnitTests.Models
         private static readonly DateTime _rootChildBirthday = new DateTime(2019, 11, 2);
 
         [Fact]
-        public void CalculateAndFill_NoDependents_PopulatesExpectedData()
+        public void CalculatePaycheck_NoDependents_PopulatesExpectedData()
         {
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
             // 78000 salary / 26 paychecks per year = 3000
@@ -26,21 +27,17 @@ namespace ApiTests.UnitTests.Models
             // 1000 per month base cost = 461.5384615384615 per paycheck (1000 * 12 = 12000 per year; 12000 / 26 = 461.5384615384615)
             var expectedDeductions = 461.54m;
             var expectedNetPay = 2538.46m;
-            var expectedEmployeeName = "Test Employee";
+            var expectedResult = (expectedGrossPay, expectedDeductions, expectedNetPay);
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.CalculateAndFill(employee);
+            var actual = paycheck.CalculatePaycheck(employee);
 
-            Assert.Equal(expectedGrossPay, paycheck.GrossPay);
-            Assert.Equal(expectedDeductions, paycheck.Deductions);
-            Assert.Equal(expectedNetPay, paycheck.NetPay);
-            Assert.Equal(expectedEmployeeName, paycheck.EmployeeName);
-            Assert.Equal(DefaultEmployeeId, paycheck.EmployeeId);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
-        public void CalculateAndFill_MultipleDependents_PopulatesExpectedData()
+        public void CalculatePaycheck_MultipleDependents_PopulatesExpectedData()
         {
             var numChildren = 6;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
@@ -55,17 +52,16 @@ namespace ApiTests.UnitTests.Models
             var expectedDeductions = 2400m;
             var expectedNetPay = 600m;
             SetUpTimeProvider();
+            var expectedResult = (expectedGrossPay, expectedDeductions, expectedNetPay);
             var paycheck = MakeSut();
 
-            paycheck.CalculateAndFill(employee);
+            var actual = paycheck.CalculatePaycheck(employee);
 
-            Assert.Equal(expectedGrossPay, paycheck.GrossPay);
-            Assert.Equal(expectedDeductions, paycheck.Deductions);
-            Assert.Equal(expectedNetPay, paycheck.NetPay);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
-        public void CalculateAndFill_OneDependentOverFifty_PopulatesExpectedData()
+        public void CalculatePaycheck_OneDependentOverFifty_PopulatesExpectedData()
         {
             var numChildren = 2;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, DefaultSalary);
@@ -81,18 +77,17 @@ namespace ApiTests.UnitTests.Models
             // (461.5384615384615 base employee cost + 830.7692307692307 base dependents cost + 92.30769230769231 additional dependent deduction for partner over 50)
             var expectedDeductions = 1384.62m;
             var expectedNetPay = 1615.38m;
+            var expectedResult = (expectedGrossPay, expectedDeductions, expectedNetPay);
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.CalculateAndFill(employee);
+            var actual = paycheck.CalculatePaycheck(employee);
 
-            Assert.Equal(expectedGrossPay, paycheck.GrossPay);
-            Assert.Equal(expectedDeductions, paycheck.Deductions);
-            Assert.Equal(expectedNetPay, paycheck.NetPay);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
-        public void CalculateAndFill_NoDependentsSalaryAboveThreshold_PopulatesExpectedData()
+        public void CalculatePaycheck_NoDependentsSalaryAboveThreshold_PopulatesExpectedData()
         {
             var salary = 80000.01m;
             var employee = MakeEmployee(DefaultEmployeeId, _defaultEmployeeBirthday, salary);
@@ -104,18 +99,17 @@ namespace ApiTests.UnitTests.Models
             // 523.0769307692307 (461.5384615384615 base employee cost + 61.53846923076923)
             var expectedDeductions = 523.08m;
             var expectedNetPay = 2553.84m;
+            var expectedResult = (expectedGrossPay, expectedDeductions, expectedNetPay);
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.CalculateAndFill(employee);
+            var actual = paycheck.CalculatePaycheck(employee);
 
-            Assert.Equal(expectedGrossPay, paycheck.GrossPay);
-            Assert.Equal(expectedDeductions, paycheck.Deductions);
-            Assert.Equal(expectedNetPay, paycheck.NetPay);
+            Assert.Equal(expectedResult, actual);
         }
 
         [Fact]
-        public void CalculateAndFill_AllEdgeCasesCombined_PopulatesExpectedData()
+        public void CalculatePaycheck_AllEdgeCasesCombined_PopulatesExpectedData()
         {
             var salary = 80000.01m;
             var numChildren = 2;
@@ -127,14 +121,13 @@ namespace ApiTests.UnitTests.Models
             // Total expected deductions = 1446.153853846154 (1384.615384615385 + 61.53846923076923; see previous 2 tests)
             var expectedDeductions = 1446.15m;
             var expectedNetPay = 1630.77m;
+            var expectedResult = (expectedGrossPay, expectedDeductions, expectedNetPay);
             SetUpTimeProvider();
             var paycheck = MakeSut();
 
-            paycheck.CalculateAndFill(employee);
+            var actual = paycheck.CalculatePaycheck(employee);
 
-            Assert.Equal(expectedGrossPay, paycheck.GrossPay);
-            Assert.Equal(expectedDeductions, paycheck.Deductions);
-            Assert.Equal(expectedNetPay, paycheck.NetPay);
+            Assert.Equal(expectedResult, actual);
         }
 
         public void Dispose() => TimeProvider.ResetToDefault();
@@ -147,9 +140,9 @@ namespace ApiTests.UnitTests.Models
             TimeProvider.Current = fakeTimeProvider.Object;
         }
 
-        private static Paycheck MakeSut()
+        private static PaycheckCalculator MakeSut()
         {
-            return new Paycheck();
+            return new PaycheckCalculator();
         }
 
         private static Employee MakeEmployee(int id, DateTime dateOfBirth, decimal salary)
@@ -166,7 +159,7 @@ namespace ApiTests.UnitTests.Models
 
         private static void MakePartner(Employee employee, Relationship partnerType, DateTime birthday)
         {
-            var partner = MakeDependent(1, partnerType, birthday);
+            var partner = MakePartner(1, partnerType, birthday);
             partner.Employee = employee;
             partner.EmployeeId = employee.Id;
             employee.Partner = (Partner)partner;
@@ -178,23 +171,33 @@ namespace ApiTests.UnitTests.Models
             {
                 var yearDecrement = i * -1;
                 var birthday = _rootChildBirthday.AddYears(yearDecrement);
-                var child = MakeDependent(i + RootDependentId, Relationship.Child, birthday);
+                var child = MakeChild(i + RootDependentId, birthday);
                 child.Employee = employee;
                 child.EmployeeId = employee.Id;
                 employee.Children.Add((Child)child);
             }
         }
 
-        private static Dependent MakeDependent(int id, Relationship relationship, DateTime birthday)
+        private static Child MakeChild(int id, DateTime birthday)
         {
-            var result = Dependent.Create(relationship);
+            var item = new Child();
+            PopulateDependent(item, id, Relationship.Child, birthday);
+            return item;
+        }
 
-            result.Id = id;
-            result.DateOfBirth = birthday;
-            result.FirstName = $"Dependent{id}";
-            result.LastName = "Test";
+        private static Partner MakePartner(int id, Relationship relationship, DateTime birthday)
+        {
+            var item = new Partner(relationship);
+            PopulateDependent(item, id, relationship, birthday);
+            return item;
+        }
 
-            return result;
+        private static void PopulateDependent(Dependent dependent, int id, Relationship relationship, DateTime birthday)
+        {
+            dependent.Id = id;
+            dependent.DateOfBirth = birthday;
+            dependent.FirstName = $"Dependent{id}";
+            dependent.LastName = "Test" ;
         }
     }
 }

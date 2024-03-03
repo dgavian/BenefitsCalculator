@@ -5,12 +5,9 @@ using Xunit;
 
 namespace ApiTests.UnitTests.Utilities
 {
-    public class HelpersTests : IDisposable
+    public class DateTimeFunctionsTests : IDisposable
     {
-        public void Dispose()
-        {
-            TimeProvider.ResetToDefault();
-        }
+        public void Dispose() => TimeProvider.ResetToDefault();
 
         [Theory]
         [InlineData(1989, 3, 1, 35)]
@@ -24,7 +21,7 @@ namespace ApiTests.UnitTests.Utilities
             TimeProvider.Current = fakeTimeProvider.Object;
             var birthday = new DateTime(birthYear, birthMonth, birthDay);
 
-            var actual = Helpers.GetAge(birthday);
+            var actual = DateTimeFunctions.GetAge(birthday);
 
             Assert.Equal(expected, actual);
         }
@@ -43,7 +40,7 @@ namespace ApiTests.UnitTests.Utilities
             TimeProvider.Current = fakeTimeProvider.Object;
             var birthday = new DateTime(birthYear, birthMonth, birthDay);
 
-            var actual = Helpers.GetAge(birthday);
+            var actual = DateTimeFunctions.GetAge(birthday);
 
             Assert.Equal(expected, actual);
         }

@@ -2,7 +2,7 @@
 
 namespace Api.Utilities
 {
-    public static class Helpers
+    public static class DateTimeFunctions
     {
         public static int GetAge(DateTime birthday)
         {
