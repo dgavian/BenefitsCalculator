@@ -30,6 +30,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDependentService, DependentService>();
+builder.Services.AddScoped<PaycheckCalculator>();
+
 builder.Services.AddScoped<Repository<Employee>, EmployeesRepository>();
 builder.Services.AddScoped<Repository<Dependent>, DependentsRepository>();
 

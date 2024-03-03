@@ -1,5 +1,6 @@
 ﻿using Api.Dtos.Dependent;
 using Api.Dtos.Employee;
+using Api.Dtos.Paycheck;
 using Api.Models;
 
 namespace Api.Services
@@ -72,6 +73,20 @@ namespace Api.Services
                 FirstName = dependent.FirstName,
                 LastName = dependent.LastName,
                 Relationship = dependent.Relationship
+            };
+
+            return result;
+        }
+
+        internal static GetPaycheckDto MapPaycheck(Employee employee, decimal grossPay, decimal deductions, decimal netPay)
+        {
+            var result = new GetPaycheckDto
+            {
+                EmployeeId = employee.Id,
+                EmployeeName = $"{employee.FirstName} {employee.LastName}",
+                GrossPay = grossPay,
+                Deductions = deductions,
+                NetPay = netPay
             };
 
             return result;

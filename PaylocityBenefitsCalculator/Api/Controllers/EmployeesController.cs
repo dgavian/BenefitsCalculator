@@ -1,4 +1,5 @@
 ﻿using Api.Dtos.Employee;
+using Api.Dtos.Paycheck;
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -33,5 +34,13 @@ public class EmployeesController : BaseController
         var sucess = true;
         var response = MakeResponse(employees, sucess);
         return Ok(response);
+    }
+
+    [SwaggerOperation(Summary = "Get employee paycheck")]
+    [HttpGet("{id}/paycheck")]
+    public async Task<ActionResult<ApiResponse<GetPaycheckDto?>>> GetPaycheck(int id)
+    {
+        var paycheck = await _employeeService.GetPaycheckAsync(id);
+        return GetActionResultForNullableItem(paycheck);
     }
 }
