@@ -5,10 +5,18 @@ namespace Api.Repositories
 {
     public abstract class Repository<T> where T : class?
     {
+        // Simulate a database here;
+        // In a production application we'd obviously want to use
+        // a real database like postgresql or mongodb.
         protected async Task<List<Employee>> GetAllEmployeesAsync()
         {
-            string fileName = @"Data\employees.json";
+            // Use Path.Combine instead of hard-coding the separator
+            // to allow this to work in multiple environments.
+            string fileName = Path.Combine("Data", "employees.json");
             using FileStream openStream = File.OpenRead(fileName);
+            // Normally I'd opt for the Newtonsoft library for this type of thing,
+            // but since this data storage is a temporary solution,
+            // just went with the built-in stuff.
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true

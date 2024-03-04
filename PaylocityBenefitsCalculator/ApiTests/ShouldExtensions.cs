@@ -9,9 +9,10 @@ namespace ApiTests;
 
 internal static class ShouldExtensions
 {
+    // There was no need that I could see for this method to be async or to exist as a pass-through to a private method.
     public static void ShouldReturn(this HttpResponseMessage response, HttpStatusCode expectedStatusCode)
     {
-        AssertCommonResponseParts(response, expectedStatusCode);
+        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
     
     public static async Task ShouldReturn<T>(this HttpResponseMessage response, HttpStatusCode expectedStatusCode, T expectedContent)
@@ -21,11 +22,6 @@ internal static class ShouldExtensions
         var apiResponse = JsonConvert.DeserializeObject<ApiResponse<T>>(await response.Content.ReadAsStringAsync());
         Assert.True(apiResponse.Success);
         Assert.Equal(JsonConvert.SerializeObject(expectedContent), JsonConvert.SerializeObject(apiResponse.Data));
-    }
-
-    private static void AssertCommonResponseParts(this HttpResponseMessage response, HttpStatusCode expectedStatusCode)
-    {
-        Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 }
 

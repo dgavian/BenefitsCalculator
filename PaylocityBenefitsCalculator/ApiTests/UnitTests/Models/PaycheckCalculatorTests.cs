@@ -14,9 +14,9 @@ namespace ApiTests.UnitTests.Models
 
         private const decimal DefaultSalary = 78000m;
 
-        private static readonly DateTime _defaultEmployeeBirthday = new DateTime(1980, 2, 16);
-        private static readonly DateTime _defaultPartnerBirthday = new DateTime(1974, 3, 3);
-        private static readonly DateTime _rootChildBirthday = new DateTime(2019, 11, 2);
+        private static readonly DateTime _defaultEmployeeBirthday = new(1980, 2, 16);
+        private static readonly DateTime _defaultPartnerBirthday = new(1974, 3, 3);
+        private static readonly DateTime _rootChildBirthday = new(2019, 11, 2);
 
         [Fact]
         public void CalculatePaycheck_NoDependents_PopulatesExpectedData()
@@ -162,7 +162,7 @@ namespace ApiTests.UnitTests.Models
             var partner = MakePartner(1, partnerType, birthday);
             partner.Employee = employee;
             partner.EmployeeId = employee.Id;
-            employee.Partner = (Partner)partner;
+            employee.Partner = partner;
         }
 
         private static void MakeChildren(int numChildren, Employee employee)
@@ -174,7 +174,7 @@ namespace ApiTests.UnitTests.Models
                 var child = MakeChild(i + RootDependentId, birthday);
                 child.Employee = employee;
                 child.EmployeeId = employee.Id;
-                employee.Children.Add((Child)child);
+                employee.Children.Add(child);
             }
         }
 
