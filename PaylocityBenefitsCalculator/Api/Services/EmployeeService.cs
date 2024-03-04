@@ -29,6 +29,9 @@ namespace Api.Services
             return result;
         }
 
+        // This would likely need to change quite a bit to be production-ready.
+        // Once the paycheck was calculated, it could be saved to the DB along with period start and end dates.
+        // Paychecks could then be searched by pay period in addition to employee id.
         public async Task<GetPaycheckDto?> GetPaycheckAsync(int employeeId)
         {
             var employee = await _repository.GetAsync(employeeId);

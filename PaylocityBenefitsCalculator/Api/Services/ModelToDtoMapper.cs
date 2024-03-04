@@ -5,6 +5,8 @@ using Api.Models;
 
 namespace Api.Services
 {
+    // I'd probably use AutoMapper for this in a production app
+    // to cut back on the explosion of this type of code.
     public static class ModelToDtoMapper
     {
         internal static List<GetEmployeeDto> MapEmployees(List<Employee> employees)
